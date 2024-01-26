@@ -9,17 +9,16 @@ router.get('/add', (req, res) => {
         res.status(400).json({ error: "Invalid input or missing numbers parameter!" });
     }
     // Convert our nums string array to floats array
-    const floatNums = numbers.map(num => parseFloat(num));
+    const decimalNums = numbers.map(num => new Decimal(num));
 
-    if (floatNums.some(isNaN)) {
+    if (decimalNums.some(num => num.isNaN())) {
         res.status(400).json({ error: "Invalid numbers in parameter!" });
     }
     // Sum our values and format our output
-    const sum = floatNums.reduce((sum, num) => sum.plus(num), new Decimal(0));
+    const sum = decimalNums.reduce((sum, num) => sum.plus(num), new Decimal(0));
 
     const formattedSum = formatOutput(sum, 10);
-    
-    res.json({result: formattedSum})
+    res.json({formattedSum: formattedSum, value: sum})
 })
 
 module.exports = router;
