@@ -4,16 +4,18 @@ const Decimal = require('decimal.js');
 const formatOutput = require('../helpers/formatOutput');
 
 router.get('/add', (req, res) => {
-    const currentNumber = req.query.currentNumber;
-    const nextNumber = req.query.nextNumber;
-
-    const currentNumberFloat = parseFloat(currentNumber);
-    const nextNumberFloat = parseFloat(nextNumber);
-
-    if(isNaN(currentNumber) || isNaN(nextNumber)) {
-        return res.status(400).json({ error: 'Invalid input or missing numbers' });
+    const numbers = req.query.numbers.split(",");
+    if (!numbers || !Array.isArray(numbers)) {
+        res.status(400).json({ error: "Invalid input or missing numbers parameter!" });
     }
-    const sum = new Decimal(currentNumberFloat).plus(nextNumberFloat);
+    // Convert our nums string array to floats array
+    const floatNums = numbers.map(num => parseFloat(num));
+
+    if (floatNums.some(isNaN)) {
+        res.status(400).json({ error: "Invalid numbers in parameter!" });
+    }
+    // Sum our values and format our output
+    const sum = floatNums.reduce((sum, num) => sum.plus(num), new Decimal(0));
 
     const formattedSum = formatOutput(sum, 10);
     
